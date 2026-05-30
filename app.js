@@ -1,37 +1,39 @@
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
+const express = require("express");
 
-const server = http.createServer((req, res) => {
-  let filePath = "./pages";
-  console.log(req.url);
-  console.log(req.method);
-  if (req.url === "/") {
-    filePath = path.join(__dirname, "pages", "home.html");
-  } else if (req.url === "/about") {
-    filePath = path.join(__dirname, "pages", "about.html");
-  } else if (req.url === "/contact") {
-    filePath = path.join(__dirname, "pages", "contact.html");
-  } else {
-    filePath = path.join(__dirname, "pages", "404.html");
-  }
+const app = express();
 
-  if (filePath) {
-    fs.readFile(filePath, (err, content) => {
-      if (err) {
-        res.writeHead(500);
-        res.end("Server Error");
-      } else {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        res.end(content);
-      }
-    });
-  } else {
-    res.writeHead(404, { "Content-Type": "text/html" });
-    res.end("404 - Page not found");
-  }
+app.get("/", (req, res, next) => {
+  console.log("Middleware executed 1");
+  console.log("Request URL:", req.originalUrl);
+  console.log("Request Method:", req.method);
+  res.send("Hello, World!");
 });
 
-server.listen(3000, () => {
+app.get("/about", (req, res, next) => {
+  console.log("Middleware executed 2");
+  console.log("Request URL:", req.originalUrl);
+  console.log("Request Method:", req.method);
+  res.send("About Us");
+});
+
+app.get("/contact-us", (req, res, next) => {
+  console.log("Request URL:", req.originalUrl);
+  console.log("Request Method:", req.method);
+  res.send(`Contact Us at: example@email.com
+    form: <form action="/contact-us" method="post">
+    <input type="text" name="name" placeholder="Your Name">
+    <input type="email" name="email" placeholder="Your Email">
+    <textarea name="message" placeholder="Your Message"></textarea>
+    <button type="submit">Send</button>
+  </form>`);
+});
+
+app.post("/contact-us", (req, res, next) => {
+  console.log("Request URL:", req.originalUrl);
+  console.log("Request Method:", req.method);
+  res.send("Thank you for contacting us!");
+});
+
+app.listen(3000, () => {
   console.log("Server running at http://localhost:3000");
 });
